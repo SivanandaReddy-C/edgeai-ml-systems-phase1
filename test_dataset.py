@@ -1,5 +1,5 @@
 
-from dataset import get_dataloaders
+from utils.dataset import get_dataloaders
 
 train_loader,test_loader= get_dataloaders(batch_size=32)
 

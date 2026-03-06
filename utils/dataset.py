@@ -3,6 +3,14 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms
 
 class MNISTDataset(Dataset):
+    """
+    custom wrapper for MNIST dataset
+    
+    Handles:
+    - data download
+    - transformations
+    - dataset abstraction layer
+    """
     def __init__(self,train=True):
         self.transform=transforms.Compose([transforms.ToTensor()])
 
