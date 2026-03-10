@@ -27,7 +27,7 @@ def get_dataloaders(batch_size=32):
     train_dataset=MNISTDataset(train=True)
     test_dataset=MNISTDataset(train=False)
 
-    train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True,drop_last=True)
+    train_loader=DataLoader(train_dataset,batch_size=batch_size,shuffle=True,num_workers=2)
     test_loader=DataLoader(test_dataset,batch_size=batch_size,shuffle=False)
 
     return train_loader,test_loader

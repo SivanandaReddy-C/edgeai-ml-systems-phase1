@@ -73,7 +73,7 @@ Model Parameters | 206,922 |
 
 ## How to Run
 ### Create environment
-conda create -n edgeai python=3.10
+conda create -n edgeai python=3.10  
 conda activate edgeai
 
 ### Install dependencies
