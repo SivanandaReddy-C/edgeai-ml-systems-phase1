@@ -1,7 +1,7 @@
 # Edge AI ML Systems - Phase 1
 
-This repository contains implementations built from scratch for learning ML systems engineering.  
-The goal of phase 1 is to build a clean ML pipeline and measure performance characteristics.
+This project implements a modular ML training pipeline from scratch using PyTorch, focusing on ML systems engineering concepts such as training pipelines, benchmarking, profiling, and configuration management.  
+
 
 ## Phase 1 Objectives
 
@@ -30,6 +30,12 @@ configs/
 
 benchmarks/  
 &nbsp;&nbsp;&nbsp;&nbsp;benchmark.py
+
+docs/  
+&nbsp;&nbsp;&nbsp;&nbsp;system_pipeline.png
+
+README.md  
+requirements.txt
 
 
 ## CNN Architecture
@@ -64,12 +70,20 @@ Components:
 - Dataset: MNIST
 
 ## Benchmark Results
-| Metric | Result |
+| Metric | Value |
 |------|------|
+Model | CNN |
+Parameters | 206,922 |
 Training Time (1 epoch) | 19.09 s |
 Single Inference Latency | 0.050 ms |
 Batch Inference Latency (32) | 1.215 ms |
-Model Parameters | 206,922 |
+Peak Memory Usage | ~335 MB |
+Best DataLoader Workers | 2 |
+
+### Observations
+- Backpropagation (`run_backward`) was the most compute-intensive operation.
+- Peak memory usage was observed during forward/backward passes due to stored activations.
+- DataLoader performance was optimal with `num_workers=2`.
 
 ## How to Run
 ### Create environment
@@ -94,4 +108,4 @@ Key engineering insights from this phase:
 - Configuration-driven experiments
 
 ## Author
-C Sivananda Reddy
+C. Sivananda Reddy
