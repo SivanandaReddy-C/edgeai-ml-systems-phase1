@@ -7,8 +7,6 @@ import torch.optim as optim
 from models.cnn import CNN
 from utils.dataset import get_dataloaders
 
-import yaml
-
 def load_config(config_path):
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
@@ -35,7 +33,6 @@ def train(model,train_loader,optimizer,criterion):
     accuracy=100*correct/total
 
     return total_loss/len(train_loader), accuracy
-
 
 
 def evaluate(model,test_loader,criterion):
@@ -68,16 +65,28 @@ def parse_args():
 
     return parser.parse_args()
 
+def override_config(config,args):
+    if args.batch_size:
+        config["training"]["batch_size"]=args.batch_size
 
+    if args.epochs:
+        config["training"]["epochs"]=args.epochs
+
+    if args.lr:
+        config["training"]["learning_rate"]=args.lr
+    
+    return config
 
 if __name__=="__main__":
     args=parse_args()
 
     config=load_config("configs/cnn.yaml")
     
-    batch_size=args.batch_size if args.batch_size else config["training"]["batch_size"]
-    epochs=args.epochs if args.epochs else config["training"]['epochs']
-    lr=args.lr if args.lr else config["training"]["learning_rate"]
+    config=override_config(config,args)
+
+    batch_size=config["training"]["batch_size"]
+    epochs=config["training"]["epochs"]
+    lr=config["training"]["learning_rate"]
 
     train_loader,test_loader=get_dataloaders(batch_size)
 
