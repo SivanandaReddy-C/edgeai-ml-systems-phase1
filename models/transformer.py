@@ -40,19 +40,72 @@ class ScaledDotProductAttention(nn.Module):
 
         return output,attention_weights
 
+class MultiHeadAttention(nn.Module):
+    def __init__(self,d_model,num_heads):
+        super().__init__()
+
+        assert d_model % num_heads==0
+
+        self.d_model=d_model
+        self.num_heads=num_heads
+        self.d_k=d_model//num_heads
+
+        self.W_q=nn.Linear(d_model,d_model)
+        self.W_k=nn.Linear(d_model,d_model)
+        self.W_v=nn.Linear(d_model,d_model)
+
+        self.attention=ScaledDotProductAttention()
+
+        self.W_o=nn.Linear(d_model,d_model)
+
+    def split_heads(self,x):
+        batch_size,seq_len,d_model=x.size()
+        x=x.view(batch_size,seq_len,self.num_heads,self.d_k)
+        x=x.transpose(1,2)
+        return x
+    
+    def forward(self,Q,K,V):
+        batch_size=Q.size(0)
+
+        Q=self.W_q(Q)
+        K=self.W_k(K)
+        V=self.W_v(V)
+        print("Q:",Q.shape)
+        print("K:",K.shape)
+        print("V:",V.shape)
+
+
+        Q=self.split_heads(Q)
+        K=self.split_heads(K)
+        V=self.split_heads(V)
+        print("Q:",Q.shape)
+        print("K:",K.shape)
+        print("V:",V.shape)
+
+        output,attention_weights=self.attention(Q,K,V)
+
+        output=output.transpose(1,2)
+
+        output=output.contiguous().view(batch_size,-1,self.d_model)
+
+        output=self.W_o(output)
+
+        return output
     
 if __name__=="__main__":
     batch_size=2
-    seq_len=4
-    d_model=8
+    seq_len=5
+    d_model=64
+    num_heads=8
 
-    Q=torch.rand(batch_size,seq_len,d_model)
-    K=torch.rand(batch_size,seq_len,d_model)
-    V=torch.rand(batch_size,seq_len,d_model)
+    x=torch.rand(batch_size,seq_len,d_model)
 
-    attention=ScaledDotProductAttention()
+    mha=MultiHeadAttention(d_model,num_heads)
 
-    output,weights=attention(Q,K,V)
+    out=mha(x,x,x)
 
-    print("Output shape:",output.shape)
-    print("Attention weights shape:",weights.shape)
+    print("Input shape:",x.shape)
+    print("Output shape:",out.shape)
+
+
+   
