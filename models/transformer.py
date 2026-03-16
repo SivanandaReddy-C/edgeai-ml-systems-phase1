@@ -26,17 +26,33 @@ class PositionalEncoding(nn.Module):
         x=x+self.pe[:,:x.size(1)]
 
         return x
+
+class ScaledDotProductAttention(nn.Module):
+    def __init__(self):
+        super().__init__()
+    
+    def forward(self,Q,K,V):
+        d_k=Q.size(-1)
+        scores=torch.matmul(Q,K.transpose(-2,-1))
+        scores=scores/math.sqrt(d_k)
+        attention_weights=torch.softmax(scores,dim=-1)
+        output=torch.matmul(attention_weights,V)
+
+        return output,attention_weights
+
     
 if __name__=="__main__":
-    d_model=512
-    seq_len=10
     batch_size=2
+    seq_len=4
+    d_model=8
 
-    x=torch.zeros(batch_size,seq_len,d_model)
+    Q=torch.rand(batch_size,seq_len,d_model)
+    K=torch.rand(batch_size,seq_len,d_model)
+    V=torch.rand(batch_size,seq_len,d_model)
 
-    pe=PositionalEncoding(d_model)
+    attention=ScaledDotProductAttention()
 
-    out=pe(x)
+    output,weights=attention(Q,K,V)
 
-    print("Input shape:",x.shape)
-    print("Output shape:",out.shape)
+    print("Output shape:",output.shape)
+    print("Attention weights shape:",weights.shape)
