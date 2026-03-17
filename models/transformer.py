@@ -70,39 +70,69 @@ class MultiHeadAttention(nn.Module):
         Q=self.W_q(Q)
         K=self.W_k(K)
         V=self.W_v(V)
-        print("Q:",Q.shape)
-        print("K:",K.shape)
-        print("V:",V.shape)
-
-
+ 
         Q=self.split_heads(Q)
         K=self.split_heads(K)
         V=self.split_heads(V)
-        print("Q:",Q.shape)
-        print("K:",K.shape)
-        print("V:",V.shape)
-
+ 
         output,attention_weights=self.attention(Q,K,V)
-
+ 
         output=output.transpose(1,2)
-
+  
         output=output.contiguous().view(batch_size,-1,self.d_model)
-
+   
         output=self.W_o(output)
-
+  
         return output
+
+class PositionwiseFeedForward(nn.Module):
+    def __init__(self,d_model,d_ff):
+        super().__init__()
+
+        self.fc1=nn.Linear(d_model,d_ff)
+        self.relu=nn.ReLU()
+        self.fc2=nn.Linear(d_ff,d_model)
+    
+    def forward(self,x):
+        return self.fc2(self.relu(self.fc1(x)))
+    
+class TransformerEncoderLayer(nn.Module):
+    def __init__(self,d_model,num_heads,d_ff):
+        super().__init__()
+
+        self.mha=MultiHeadAttention(d_model,num_heads)
+        self.ffn=PositionwiseFeedForward(d_model,d_ff)
+
+        self.norm1=nn.LayerNorm(d_model)
+        self.norm2=nn.LayerNorm(d_model)
+
+    def forward(self,x):
+        #Multi-head attention
+        attn_output=self.mha(x,x,x)
+
+        #Residual connection + LayerNorm
+        x=self.norm1(x+attn_output)
+
+        # Feed forward network
+        ffn_output=self.ffn(x)
+
+        #Residual connection + LayerNorm
+        x=self.norm2(x+ffn_output)
+
+        return x
     
 if __name__=="__main__":
     batch_size=2
     seq_len=5
     d_model=64
     num_heads=8
-
+    d_ff=256
+    
     x=torch.rand(batch_size,seq_len,d_model)
 
-    mha=MultiHeadAttention(d_model,num_heads)
+    encoder_layer=TransformerEncoderLayer(d_model,num_heads,d_ff)
 
-    out=mha(x,x,x)
+    out=encoder_layer(x)
 
     print("Input shape:",x.shape)
     print("Output shape:",out.shape)
