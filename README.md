@@ -11,13 +11,14 @@ This project implements a modular ML training pipeline from scratch using PyTorc
 - Benchmark CNN vs Transformer
 
 ## System Pipeline
-![Pipeline](docs/system_pipeline.png)
+![Pipeline](docs/system_pipeline1.png)
 ## Repository Structure
 
 edgeai-ml-systems-phase1/
 
 models/  
 &nbsp;&nbsp;&nbsp;&nbsp;cnn.py  
+&nbsp;&nbsp;&nbsp;&nbsp;transformer.py 
 
 training/  
 &nbsp;&nbsp;&nbsp;&nbsp;train.py 
@@ -32,7 +33,8 @@ benchmarks/
 &nbsp;&nbsp;&nbsp;&nbsp;benchmark.py
 
 docs/  
-&nbsp;&nbsp;&nbsp;&nbsp;system_pipeline.png
+&nbsp;&nbsp;&nbsp;&nbsp;system_pipeline1.png  
+&nbsp;&nbsp;&nbsp;&nbsp;transformer_encoder1.png
 
 README.md  
 requirements.txt
@@ -58,10 +60,16 @@ ReLU
 
 Fully Connected (128 → 10)
 
-Total Parameters:206,922
+Total Parameters: 206,922
+
+## Transformer Encoder Architecture
+The Transformer encoder is implemented using multi-head self-attention and feed-forward layers stacked sequentially.
+<p align="center">
+  <img src="docs/transformer_encoder1.png" alt="Transformer">
+</p>
 
 ## Training Pipeline
-The training loop follows the standard PyTorch workflow:   
+The training loop follows a model-agnostic PyTorch workflow applicable to both CNN and Transformer models:  
 Forward Pass → Loss Calculation → Backpropagation → Optimizer Update
 
 Components:
@@ -69,26 +77,42 @@ Components:
 - Optimizer: Adam
 - Dataset: MNIST
 
-## Transformer Encoder Architecture
-<p align="center">
-  <img src="docs/transformer_encoder1.png" alt="Transformer">
-</p>
+## CNN vs Transformer Comparison
 
-## Benchmark Results
-| Metric | Value |
-|------|------|
-Model | CNN |
-Parameters | 206,922 |
-Training Time (1 epoch) | 19.09 s |
-Single Inference Latency | 0.050 ms |
-Batch Inference Latency (32) | 1.215 ms |
-Peak Memory Usage | ~335 MB |
-Best DataLoader Workers | 2 |
+| Metric | CNN | Transformer |
+|------|------|------------|
+| Training Time (1 epoch) | 17.36 s | 30.45 s |
+| Single Inference Latency | 0.301 ms | 1.302 ms |
+| Batch Inference Latency (32) | 1.164 ms | 2.641 ms |
+| Parameters | 206,922 | 102,474 |
+| Peak Memory Usage | ~335 MB | ~335 MB |
+| Best DataLoader Workers | \- | 2 |
 
-### Observations
-- Backpropagation (`run_backward`) was the most compute-intensive operation.
-- Peak memory usage was observed during forward/backward passes due to stored activations.
-- DataLoader performance was optimal with `num_workers=2`.
+### Key Insights
+
+- Transformer models have fewer parameters but higher computational complexity due to attention mechanisms (O(n²)).
+- CNN is significantly faster for image-based tasks due to localized convolution operations.
+- Transformer shows slower training and inference despite lower parameter count.
+- Batch inference reduces the performance gap but CNN remains more efficient.
+- Peak memory usage is similar for both models in this setup, indicating that activations and runtime dominate memory usage.
+- DataLoader performance depends on system configuration and is independent of model architecture.
+
+## Engineering Learnings
+
+- Parameter count alone does not determine model efficiency.
+- Attention mechanisms introduce quadratic complexity with sequence length.
+- Profiling tools like cProfile and memory_profiler are essential for identifying bottlenecks.
+- Backpropagation is the most computationally expensive step in training.
+- Data loading can become a bottleneck without proper tuning.
+- Benchmarking should evaluate training, inference, and memory — not just accuracy.
+
+## Conclusion
+
+This project demonstrates a complete ML systems pipeline including model implementation, training, profiling, and benchmarking.
+
+CNN models are more efficient for image-based tasks due to optimized convolution operations, while Transformer models provide architectural flexibility but introduce higher computational overhead.
+
+This comparison highlights the importance of evaluating machine learning models from a systems perspective rather than relying solely on accuracy or parameter count.
 
 ## How to Run
 ### Create environment
@@ -103,14 +127,6 @@ python -m training.train
 
 ### Run benchmarks
 python -m benchmarks.benchmark
-
-## Lessons Learned
-Key engineering insights from this phase:
-- Modular ML project design
-- Importance of dataset abstraction
-- Training loop mechanics
-- Benchmarking inference latency
-- Configuration-driven experiments
 
 ## Author
 C. Sivananda Reddy

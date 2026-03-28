@@ -37,7 +37,7 @@ def override_config(config,args):
     
     return config
 
-#@profile
+@profile
 def train(model,train_loader,optimizer,criterion):
     model.train()
 
@@ -135,16 +135,16 @@ def main():
 
 
 if __name__=="__main__":
-    profiler = cProfile.Profile()
+    #profiler = cProfile.Profile()
 
-    profiler.enable()
+    #profiler.enable()
 
     main()
 
-    profiler.disable()
+    #profiler.disable()
 
-    profiler.print_stats(sort="time")
-    profiler.dump_stats("training_profile.prof")
+    #profiler.print_stats(sort="time")
+    #profiler.dump_stats("training_profile.prof")
 
 
 
