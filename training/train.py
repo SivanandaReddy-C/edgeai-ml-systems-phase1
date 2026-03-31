@@ -12,6 +12,13 @@ from models.cnn import CNN
 from utils.dataset import get_dataloaders
 
 def parse_args():
+    """
+    Parses command-line arguments for training configuration
+
+    Returns:
+        argparse.Namespace: Parsed arguments including batch size,
+        number of epochs, learning rate, and model name.
+    """
     parser = argparse.ArgumentParser(description="CNN Training Script")
 
     parser.add_argument("--batch_size",type=int,help="Batch size for training")
@@ -22,11 +29,30 @@ def parse_args():
     return parser.parse_args()
 
 def load_config(config_path):
+    """
+    Loads YAML configuration file.
+
+    Args
+        config_path (str): Path to YAML config file.
+
+    Returns:
+        dict: Configuration dictionary containing training and model settings.
+    """
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
 
 def override_config(config, args):
+    """
+    Overrides YAML configuration with command-line arguments.
+
+    Args:
+        config (dict): Original configuration dictionary.
+        args (argparse.Namespace): Parsed CLI arguments
+
+    Returns:
+        dict: Updated configuration dictionary.
+    """
     if args.batch_size:
         config["training"]["batch_size"] = args.batch_size
 
@@ -43,6 +69,20 @@ def override_config(config, args):
 
 @profile
 def train(model,train_loader, optimizer,criterion):
+    """
+    Runs one epoch of training.
+
+    Args:
+        model (torch.nn.Module): Model to train.
+        train_loader (DataLoader): Training data loader.
+        optimizer (torch.optim.Optimizer): Optimizer for parameter updates.
+        criterion (torch.nn.Module): Loss function.
+
+    Returns:
+        tuple:
+            avg_loss (float): Average training loss.
+            accuracy (float): Training accuracy (%).
+    """
     model.train()
 
     total_loss = 0
@@ -66,6 +106,19 @@ def train(model,train_loader, optimizer,criterion):
 
 
 def evaluate(model,test_loader, criterion):
+    """
+    Evaluates the model on validation/test dataset.
+
+    Args:
+        model (torch.nn.Module): Model to evaluate
+        test_loader (DataLoader): Validation/test data loader.
+        criterion (torch.nn.Module): Loss function.
+
+    Return:
+        tuple:
+            avg_loss (float): Average validation loss.
+            accuracy (float): Validation accuracy (%).
+    """
     model.eval()
 
     total_loss = 0
@@ -86,6 +139,15 @@ def evaluate(model,test_loader, criterion):
     return total_loss / len(test_loader),accuracy
 
 def main():
+    """
+    Main training pipeline.
+
+    -Loads configuration
+    -Initializes model, optimizer, and data loaders
+    -Runs training and validation loops
+    -Tracks best model based on validation accuracy
+    -Measures training and validation time per epoch
+    """
     args = parse_args()
     config = load_config("configs/cnn.yaml")  
     config = override_config(config,args)
@@ -138,7 +200,7 @@ def main():
             
             best_accuracy = val_acc
             
-            torch.save(model.state_dict(),"best_model.pth")
+            torch.save(model.state_dict(),"best_transformer.pth")
             
             print("Best model saved!")
 

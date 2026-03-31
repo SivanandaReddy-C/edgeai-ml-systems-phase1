@@ -16,6 +16,10 @@ The focus is on system-level understanding including training workflows, perform
 
 ## System Pipeline
 ![Pipeline](docs/system_pipeline1.png)
+
+## Phase 2 - Deployment Pipeline
+PyTorch → ONNX → Runtime → Quantization → Edge Deployment
+
 ## Repository Structure
 
 edgeai-ml-systems-phase1/
