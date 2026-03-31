@@ -1,4 +1,5 @@
-# Edge AI ML Systems - Phase 1
+# Edge AI ML Systems
+## Phase 1 — Model Development & Benchmarking
 
 ## Project Overview
 
@@ -18,7 +19,34 @@ The focus is on system-level understanding including training workflows, perform
 ![Pipeline](docs/system_pipeline1.png)
 
 ## Phase 2 - Deployment Pipeline
-PyTorch → ONNX → Runtime → Quantization → Edge Deployment
+PyTorch → ONNX → Runtime → Quantization → Edge Deployment  
+Goal: Optimize trained models for real-world inference performance
+
+## ONNX Deployment
+
+### Model Export
+- Exported CNN and Transformer models from PyTorch to ONNX format
+- Used dummy inputs to trace computation graphs
+
+### Validation
+- Verified ONNX model structure using ONNX checker
+- Ensured compatibility before inference
+
+### Inference (ONNX Runtime)
+- Ran inference using ONNX Runtime (C++ backend)
+- Used NumPy arrays instead of PyTorch tensors
+
+### Performance Benchmark
+| Model | PyTorch Latency | ONNX Latency |
+|------|----------------|-------------|
+| CNN  | 5.6070 ms      | 0.1009 ms   |
+
+### Key Insights
+- ONNX Runtime significantly reduces inference latency by eliminating Python overhead
+- Static graph execution enables runtime optimizations
+- Proper validation prevents runtime errors
+- Input/output names must match exactly during inference
+- Warmup iterations are necessary for accurate benchmarking
 
 ## Repository Structure
 
