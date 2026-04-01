@@ -28,6 +28,26 @@ Goal: Optimize trained models for real-world inference performance
 - Exported CNN and Transformer models from PyTorch to ONNX format
 - Used dummy inputs to trace computation graphs
 
+## Quantization
+
+### Objective
+Optimize model inference performance by reducing numerical precision from FP32 to INT8.
+
+### Motivation
+- Reduce model size (~4x smaller)
+- Improve inference latency
+- Enable efficient deployment on resource-constrained devices
+
+### Approach
+- Applied dynamic quantization on PyTorch models
+- Focused on Linear layers (most impactful for Transformer)
+
+### Tradeoff
+- Achieved faster inference with minimal accuracy degradation
+
+### Key Insight
+Quantization complements ONNX optimization by reducing computation cost, not just execution overhead.
+
 ### Validation
 - Verified ONNX model structure using ONNX checker
 - Ensured compatibility before inference
