@@ -18,9 +18,11 @@ torch.onnx.export(
     opset_version=17,
     input_names=["input"],
     output_names=["output"],
-    do_constant_folding=True,
-    export_params=True,
-    dynamo=False   # 🔥 THIS IS THE KEY FIX
+    dynamic_axes={
+        "input": {0: "batch_size"},
+        "output": {0: "batch_size"}
+    },
+    dynamo=False  
 )
 
 print("Model exported to cnn.onnx")
