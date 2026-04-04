@@ -1,9 +1,11 @@
 import os
-from onnxruntime.quantization import quantize_dynamic
+from onnxruntime.quantization import quantize_dynamic, QuantType
 
 quantize_dynamic(
     "deployment/cnn.onnx",
-    "deployment/cnn_int8.onnx"
+    "deployment/cnn_int8.onnx",
+    weight_type=QuantType.QInt8,
+    op_types_to_quantize=["MatMul"]  
 )
 
 print("ONNX quantization complete!")
